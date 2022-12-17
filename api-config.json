@@ -1,0 +1,49 @@
+{
+"routes": [
+  {
+    "method": "get",
+    "endpoint": "api",
+    "responses" : [
+      {
+        "body": "",
+        "filePath": "1234-FI/data.json",
+        "statusCode": 200,
+        "headers": [
+          {
+            "key": "Authorization",
+            "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyLCJjaWQiOiIxMjM0IiwiY291bnRyeSI6IkZJIn0.1xkM--PUZj2PIEXfZ0EMHPF2vgujKHwOREoDzg1dmxE"
+          }
+        ]
+      },
+      {
+        "body": "",
+        "filePath": "1234-FI/data.json",
+        "statusCode": 200,
+        "headers": [
+          {
+            "key": "Authorization",
+            "value": "Bearer "
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "method": "post",
+    "endpoint": "api",
+    "responses" : [
+      {
+        "body": "",
+        "filePath": "1234-FI/data.json",
+        "statusCode": 400,
+        "headers": [
+          {
+            "key": "",
+            "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyLCJjaWQiOiIxMjM0IiwiY291bnRyeSI6IkZJIn0.1xkM--PUZj2PIEXfZ0EMHPF2vgujKHwOREoDzg1dmxE"
+          }
+        ]
+      }
+    ]
+  }
+]
+}
