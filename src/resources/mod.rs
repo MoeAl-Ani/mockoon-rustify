@@ -6,7 +6,7 @@ use std::thread;
 use std::time::Duration;
 use actix_web::{HttpRequest, HttpResponse, HttpResponseBuilder, Resource, Responder, web};
 use actix_web::http::{Method, StatusCode};
-use actix_web::http::header::HeaderValue;
+use actix_web::http::header::{HeaderMap, HeaderName, HeaderValue};
 use actix_web::web::{Data, resource};
 use serde::de::Unexpected::Map;
 use crate::model::*;
@@ -35,7 +35,9 @@ async fn handler(req: HttpRequest, route_meta: Data<RouteMeta>) -> impl Responde
 
     match req.headers().get("authorization") {
         None => {
-            HttpResponse::with_body(StatusCode::from_u16(route.responses.get(0).unwrap().status_code).unwrap(), format!(""))
+            let mut response = HttpResponse::with_body(StatusCode::from_u16(route.responses.get(0).unwrap().status_code).unwrap(), format!(""));
+            write_headers(response.headers_mut(), route.responses.get(0).unwrap().clone());
+            response
         }
         Some(bearer) => {
             let mut r = route.responses.get(0).unwrap().clone();
@@ -48,13 +50,23 @@ async fn handler(req: HttpRequest, route_meta: Data<RouteMeta>) -> impl Responde
             }
 
             if r.status_code >=200 && r.status_code < 400 {
-                let file_path = PathBuf::from(route_meta.0.clone()).join(r.file_path).canonicalize().unwrap();
-                let json = std::fs::read_to_string(file_path).unwrap_or(r.body);
-                HttpResponse::with_body(StatusCode::from_u16(r.status_code).unwrap(), json)
+                let file_path = PathBuf::from(route_meta.0.clone()).join(r.file_path.clone()).canonicalize().unwrap();
+                let json = std::fs::read_to_string(file_path).unwrap_or(r.body.clone());
+                let mut response = HttpResponse::with_body(StatusCode::from_u16(r.status_code.clone()).unwrap(), json);
+                write_headers(response.headers_mut(), r.clone());
+                response
             } else {
-                HttpResponse::with_body(StatusCode::from_u16(r.status_code).unwrap(), format!(""))
+                let mut response = HttpResponse::with_body(StatusCode::from_u16(r.status_code.clone()).unwrap(), format!(""));;
+                write_headers(response.headers_mut(), r.clone());
+                response
             }
         }
+    }
+}
+
+fn write_headers(headers: &mut HeaderMap, response: Response) {
+    for header in response.headers {
+        headers.insert(HeaderName::from_str(header.key.as_str()).unwrap(), HeaderValue::from_str(header.value.as_str()).unwrap());
     }
 }
 
