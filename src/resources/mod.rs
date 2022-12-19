@@ -60,7 +60,6 @@ async fn handler(req: HttpRequest, route_meta: Data<RouteMeta>) -> impl Responde
 
 pub struct RouteMeta(pub String, pub HashMap<String, Route>);
 pub fn config(cfg: &mut web::ServiceConfig) {
-    thread::sleep(Duration::from_secs(5));
     let mut scope = web::scope("");
     let mut route_map = HashMap::new();
     let path_configs = extract_config_path();
