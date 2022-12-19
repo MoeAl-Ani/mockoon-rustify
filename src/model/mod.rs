@@ -6,7 +6,7 @@ const METHODS: [&str; 6] = ["get", "post", "patch", "delete", "option", "head"];
 #[derive(Debug, Clone, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Root {
-    pub routes: Vec<Route>
+    pub routes: Vec<Route>,
 }
 #[derive(Debug, Clone, Deserialize)]
 #[serde(rename_all = "camelCase")]

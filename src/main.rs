@@ -1,10 +1,10 @@
-mod model;
-mod resources;
-mod util;
-
 use actix_web::{App, HttpServer, web};
 use actix_web::middleware::Logger;
 use env_logger::Env;
+
+mod model;
+mod resources;
+mod util;
 
 #[tokio::main]
 async fn main() -> std::io::Result<()> {

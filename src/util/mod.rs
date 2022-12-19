@@ -1,3 +1,6 @@
+use std::path::PathBuf;
+use std::str::FromStr;
+use clap::{Arg, Command};
 use crate::model::TokenClaim;
 
 pub fn decode_jwt(bearer: Option<String>) -> TokenClaim {
@@ -24,9 +27,83 @@ pub fn decode_jwt(bearer: Option<String>) -> TokenClaim {
     }
 }
 
+pub fn extract_config_path() -> (String, String) {
+    let cfg = Command::new("Mockoon Rustify")
+        .version("1.0.0")
+        .author("Al-Ani, Mohammed")
+        .about("API mocking")
+        .arg(Arg::new("data").required(true).short('d').long("data"))
+        .try_get_matches().unwrap();
+
+    let api_config_file = cfg.get_one::<String>("data").unwrap();
+    let path_buf = PathBuf::from(api_config_file);
+    let path_buf = std::fs::canonicalize(&path_buf).unwrap();
+
+    (path_buf.display().to_string(), path_buf.parent().unwrap().display().to_string())
+}
+
 #[actix_web::test]
 async fn decode_jwt_token_test() {
     let mut jwt = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyLCJjaWQiOiIxMjM0IiwiY291bnRyeSI6IkZJIn0.1xkM--PUZj2PIEXfZ0EMHPF2vgujKHwOREoDzg1dmxE";
     let claim = decode_jwt(Some(format!("{}", jwt)));
     assert_eq!("1234-FI", claim.user())
+}
+
+#[actix_web::test]
+async fn extract_dir_from_file_path() {
+    init_logger();
+    let file = "./api-config.json";
+    let buf = PathBuf::from(file);
+    let buf = std::fs::canonicalize(&buf).unwrap();
+
+    log::info!("{}", buf.display());
+    log::info!("{}", buf.parent().unwrap().display());
+
+    assert_eq!(true, buf.is_absolute());
+    assert_eq!(true, buf.is_file());
+    assert_eq!(true, buf.parent().unwrap().is_absolute());
+    assert_eq!(true, buf.parent().unwrap().is_dir());
+
+    let response_file_path = "./1234-FI/data.json";
+    let file_path = buf.parent().unwrap().join(response_file_path);
+    log::info!("file_path = {}", file_path.display());
+    let json = std::fs::read_to_string(file_path).unwrap();
+    log::info!("file_data = {}", json);
+
+    // custom dir not root
+    let file = "./data/api-config.json";
+    let buf = PathBuf::from(file);
+    let buf = std::fs::canonicalize(&buf).unwrap();
+
+    log::info!("{}", buf.display());
+    log::info!("{}", buf.parent().unwrap().display());
+
+    let response_file_path = "./1234-FI/data.json";
+    let file_path = buf.parent().unwrap().join(response_file_path);
+    log::info!("file_path = {}", file_path.display());
+    let json = std::fs::read_to_string(file_path).unwrap();
+    log::info!("file_data = {}", json);
+
+}
+
+
+pub fn init_logger() {
+    use chrono::Local;
+    use env_logger::Builder;
+    use log::LevelFilter;
+    use std::io::Write;
+
+    std::env::set_var("RUST_LOG", "debug");
+    std::env::set_var("RUST_BACKTRACE", "1");
+    Builder::new()
+        .format(|buf, record| {
+            writeln!(buf,
+                     "{} [{}] - {}",
+                     Local::now().format("%Y-%m-%dT%H:%M:%S"),
+                     record.level(),
+                     record.args()
+            )
+        })
+        .filter(None, LevelFilter::Debug)
+        .init();
 }
