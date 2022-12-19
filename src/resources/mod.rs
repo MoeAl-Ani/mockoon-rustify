@@ -48,7 +48,7 @@ async fn handler(req: HttpRequest, route_meta: Data<RouteMeta>) -> impl Responde
             }
 
             if r.status_code >=200 && r.status_code < 400 {
-                let file_path = PathBuf::from(route_meta.0.clone()).join(r.file_path);
+                let file_path = PathBuf::from(route_meta.0.clone()).join(r.file_path).canonicalize().unwrap();
                 let json = std::fs::read_to_string(file_path).unwrap_or(r.body);
                 HttpResponse::with_body(StatusCode::from_u16(r.status_code).unwrap(), json)
             } else {
