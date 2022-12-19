@@ -33,13 +33,22 @@ pub fn extract_config_path() -> (String, String) {
         .author("Al-Ani, Mohammed")
         .about("API mocking")
         .arg(Arg::new("data").required(true).short('d').long("data"))
-        .try_get_matches().unwrap();
+        .try_get_matches();
 
-    let api_config_file = cfg.get_one::<String>("data").unwrap();
-    let path_buf = PathBuf::from(api_config_file);
-    let path_buf = std::fs::canonicalize(&path_buf).unwrap();
-
-    (path_buf.display().to_string(), path_buf.parent().unwrap().display().to_string())
+    match cfg {
+        Ok(arg_match) => {
+            let api_config_file = arg_match.get_one::<String>("data").unwrap();
+            let path_buf = PathBuf::from(api_config_file);
+            let path_buf = std::fs::canonicalize(&path_buf).unwrap();
+            (path_buf.display().to_string(), path_buf.parent().unwrap().display().to_string())
+        }
+        Err(_) => {
+            let api_config_file = "./api-config.json";
+            let path_buf = PathBuf::from(api_config_file);
+            let path_buf = std::fs::canonicalize(&path_buf).unwrap();
+            (path_buf.display().to_string(), path_buf.parent().unwrap().display().to_string())
+        }
+    }
 }
 
 #[actix_web::test]
