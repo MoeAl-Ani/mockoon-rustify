@@ -1,3 +1,7 @@
+cargo clean
+cargo build
+docker kill $(docker ps -aq)
+docker rm $(docker ps -aq)
 docker build -t mockoon-rust .
 data_volume=$PWD/data
 echo $data_volume
