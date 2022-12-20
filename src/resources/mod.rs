@@ -34,7 +34,8 @@ async fn handler(req: HttpRequest, route_meta: Data<RouteMeta>) -> impl Responde
 
     match req.headers().get("authorization") {
         None => {
-            let mut response = HttpResponse::with_body(StatusCode::from_u16(route.responses.get(0).unwrap().status_code).unwrap(), format!(""));
+            let mocked_response = route.responses.get(0).unwrap();
+            let mut response = HttpResponse::with_body(StatusCode::from_u16(mocked_response.status_code.clone()).unwrap(), mocked_response.body.clone());
             write_headers(response.headers_mut(), route.responses.get(0).unwrap().clone());
             response
         }
