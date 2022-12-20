@@ -30,7 +30,6 @@ fn generate_handlers(api_config_path: String) -> Vec<(String, String, actix_web:
 async fn handler(req: HttpRequest, route_meta: Data<RouteMeta>) -> impl Responder {
     log::info!("request method: {}", req.method());
     log::info!("request path: {}", req.path());
-    log::info!("route map: {:?}", route_meta.1);
     let route = route_meta.1.get(format!("{}-{}", req.method().to_string().clone(), req.path().to_string()).as_str()).unwrap();
 
     match req.headers().get("authorization") {
