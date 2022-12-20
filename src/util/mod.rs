@@ -43,7 +43,7 @@ pub fn extract_config_path() -> (String, String) {
             (path_buf.display().to_string(), path_buf.parent().unwrap().display().to_string())
         }
         Err(_) => {
-            let api_config_file = "./data/api-config.json";
+            let api_config_file = "data/api-config.json";
             let path_buf = PathBuf::from(api_config_file);
             let path_buf = std::fs::canonicalize(&path_buf).unwrap();
             (path_buf.display().to_string(), path_buf.parent().unwrap().display().to_string())
@@ -61,33 +61,15 @@ async fn decode_jwt_token_test() {
 #[actix_web::test]
 async fn extract_dir_from_file_path() {
     init_logger();
-    let file = "./api-config.json";
-    let buf = PathBuf::from(file);
-    let buf = std::fs::canonicalize(&buf).unwrap();
-
-    log::info!("{}", buf.display());
-    log::info!("{}", buf.parent().unwrap().display());
-
-    assert_eq!(true, buf.is_absolute());
-    assert_eq!(true, buf.is_file());
-    assert_eq!(true, buf.parent().unwrap().is_absolute());
-    assert_eq!(true, buf.parent().unwrap().is_dir());
-
-    let response_file_path = "./1234-FI/data.json";
-    let file_path = buf.parent().unwrap().join(response_file_path);
-    log::info!("file_path = {}", file_path.display());
-    let json = std::fs::read_to_string(file_path).unwrap();
-    log::info!("file_data = {}", json);
-
     // custom dir not root
-    let file = "./data/api-config.json";
+    let file = "data/api-config.json";
     let buf = PathBuf::from(file);
     let buf = std::fs::canonicalize(&buf).unwrap();
 
     log::info!("{}", buf.display());
     log::info!("{}", buf.parent().unwrap().display());
 
-    let response_file_path = "./1234-FI/data.json";
+    let response_file_path = "1234-FI/data.json";
     let file_path = buf.parent().unwrap().join(response_file_path);
     log::info!("file_path = {}", file_path.display());
     let json = std::fs::read_to_string(file_path).unwrap();
