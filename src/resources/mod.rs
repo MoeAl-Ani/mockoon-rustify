@@ -6,7 +6,7 @@ use std::thread;
 use std::time::Duration;
 use actix_web::{HttpRequest, HttpResponse, HttpResponseBuilder, Resource, Responder, web};
 use actix_web::http::{Method, StatusCode};
-use actix_web::http::header::{HeaderMap, HeaderName, HeaderValue};
+use actix_web::http::header::{HeaderMap, HeaderName, HeaderValue, InvalidHeaderName, InvalidHeaderValue};
 use actix_web::web::{Data, resource};
 use serde::de::Unexpected::Map;
 use crate::model::*;
@@ -65,8 +65,26 @@ async fn handler(req: HttpRequest, route_meta: Data<RouteMeta>) -> impl Responde
 }
 
 fn write_headers(headers: &mut HeaderMap, response: Response) {
-    for header in response.headers {
-        headers.insert(HeaderName::from_str(header.key.as_str()).unwrap(), HeaderValue::from_str(header.value.as_str()).unwrap());
+    for header in &response.headers {
+        let header_name = match HeaderName::from_str(header.key.as_str()) {
+            Ok(data) => {
+                data
+            }
+            Err(err) => {
+                log::error!("invalid header name: {}", header.key);
+                panic!("invalid header name: {}", err);
+            }
+        };
+        let header_value = match HeaderValue::from_str(header.value.as_str()) {
+            Ok(data) => {
+                data
+            }
+            Err(err) => {
+                log::error!("invalid header value: {}", header.value);
+                panic!("invalid header value: {}", err);
+            }
+        };
+        headers.insert(header_name, header_value);
     }
 }
 
